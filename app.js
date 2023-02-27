@@ -7,6 +7,7 @@ const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const sqlRouter = require('./routes/sql');
+const sql2Router = require('./routes/sql2');
 
 const app = express();
 
@@ -23,6 +24,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/sql', sqlRouter);
+
+app.get('/sql2', async (req, res) => {
+  const data = await sql2Router.getData();
+  res.send(data);
+});
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

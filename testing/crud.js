@@ -5,9 +5,10 @@ const TYPES = require('tedious').TYPES;
 const async = require('async');
 
 // Create connection to database
+// host: '10.231.6.86',
 let config = {
-    host: '10.231.6.86',
-    server: 'Ubby',
+    server: 'VM-Windy10',
+    host: '192.168.1.197',
     authentication: {
         type: 'default',
         options: {
@@ -93,15 +94,16 @@ function Read(callback) {
 
     // Read all rows from table
     request = new Request(
-    'SELECT Id, Name, Location FROM TestSchema.Employees;',
-    function(err, rowCount, rows) {
-    if (err) {
-        callback(err);
-    } else {
-        console.log(rowCount + ' row(s) returned');
-        callback(null);
-    }
-    });
+        'SELECT Id, Name, Location FROM TestSchema.Employees;',
+        function(err, rowCount, rows) {
+            if (err) {
+                callback(err);
+            } else {
+                console.log(rowCount + ' row(s) returned');
+                callback(null);
+            }
+        }
+    );
 
     // Print the rows read
     var result = "";
@@ -131,7 +133,7 @@ function Complete(err, result) {
 
 // Attempt to connect and execute queries if connection goes through
 connection.on('connect', function(err) {
-    console.log('connection');
+    console.log('Event: connect');
   if (err) {
     console.log(err);
   } else {
@@ -140,7 +142,15 @@ connection.on('connect', function(err) {
     // Execute all functions in the array serially
     async.waterfall([
         Start
-    ]);
+    ], (err, res) => {
+        if(err) {
+            console.error(err);
+        } else {
+            console.log('Done!');
+            console.dir(res);
+            connection.close();
+        }
+    });
 /* 
     async.waterfall([
         Start,
@@ -152,5 +162,11 @@ connection.on('connect', function(err) {
      */
   }
 });
+connection.on('end', () => {
+    console.log('Event: end');
+});
+connection.on('done', (rowCount) => {
+    console.log('Event: done');
+})
 
 connection.connect();
